@@ -20,12 +20,15 @@ export default function Home(){
 
   const [f, setF] = useState({ nome:'', whatsapp:'', nome2:'', template:'' });
 
+  // força re-render quando templates locais mudarem
+  const [tplTick, setTplTick] = useState(0);
+
   const templates = useMemo(()=>{
     const uniq = new Set(list.map(r=>r.template).filter(Boolean));
     const local = (typeof window !== 'undefined' && JSON.parse(localStorage.getItem('templates')||'[]')) || [];
     local.forEach(t=>uniq.add(t));
     return Array.from(uniq);
-  }, [list]);
+  }, [list, tplTick]);
 
   async function load(){
     setLoading(true);
@@ -44,6 +47,9 @@ export default function Home(){
     const cur = JSON.parse(localStorage.getItem('templates')||'[]');
     if (!cur.includes(t)) {
       localStorage.setItem('templates', JSON.stringify([...cur, t]));
+      setTplTick(x=>x+1);
+    } else {
+      setTplTick(x=>x+1);
     }
   }
 
@@ -97,7 +103,7 @@ export default function Home(){
           <Field label="Usuário"><input className="input" value={cred.user} onChange={e=>setCred(v=>({...v, user:e.target.value}))} placeholder="admin"/></Field>
           <Field label="Senha"><input className="input" type="password" value={cred.pass} onChange={e=>setCred(v=>({...v, pass:e.target.value}))} placeholder="••••••"/></Field>
           <button className="btn-primary hover-raise" onClick={login}>Entrar</button>
-          <p className="text-xs text-n8n-soft">Dica: defina AUTH_USER/ AUTH_PASS nas variáveis do Vercel.</p>
+          <p className="text-xs text-n8n-soft">Dica: admin / admin123 (forçado).</p>
         </div>
       </div>
     </div>
@@ -136,7 +142,7 @@ export default function Home(){
           <Field label="De"><input type="date" className="input" value={from} onChange={e=>setFrom(e.target.value)} /></Field>
           <Field label="Até"><input type="date" className="input" value={to} onChange={e=>setTo(e.target.value)} /></Field>
           <div className="ml-auto text-sm text-n8n-soft">
-            {stats.enviados} enviados × $ 0.06 = <span className="text-white font-medium">${'{'}stats.custo.toFixed(2){'}'}</span>
+            {stats.enviados} enviados × $ 0.06 = <span className="text-white font-medium">${stats.custo?.toFixed ? stats.custo.toFixed(2) : '0.00'}</span>
           </div>
         </section>
 
@@ -147,15 +153,28 @@ export default function Home(){
             <Field label="WhatsApp"><input className="input" value={f.whatsapp} onChange={e=>setF(v=>({...v, whatsapp:e.target.value}))} placeholder="55DDD9XXXXXXXX"/></Field>
             <Field label="Indicação (opcional)"><input className="input" value={f.nome2} onChange={e=>setF(v=>({...v, nome2:e.target.value}))} placeholder="Quem indicou"/></Field>
             <Field label="Template">
-              <div className="flex gap-2">
-                <select className="input" value={f.template} onChange={e=>setF(v=>({...v, template:e.target.value}))}>
-                  <option value="">Selecione…</option>
-                  {templates.map(t=> <option key={t} value={t}>{t}</option>)}
-                </select>
-                <button className="btn-soft" onClick={()=>{
-                  const t = prompt('Nome do novo template'); if(t){ addLocalTemplate(t); setF(v=>({...v, template:t})); }
-                }}>+ template</button>
-              </div>
+              <select
+                className="input"
+                value={f.template}
+                onChange={(e)=>{
+                  const val = e.target.value;
+                  if (val === '__add__') {
+                    const t = window.prompt('Nome do novo template');
+                    if (t && t.trim()) {
+                      addLocalTemplate(t.trim());
+                      setF(v=>({...v, template: t.trim()}));
+                    } else {
+                      setF(v=>({...v, template: ''}));
+                    }
+                  } else {
+                    setF(v=>({...v, template: val}));
+                  }
+                }}
+              >
+                <option value="">Selecione…</option>
+                {templates.map(t=> <option key={t} value={t}>{t}</option>)}
+                <option value="__add__">+ Adicionar novo template…</option>
+              </select>
             </Field>
           </div>
           <div className="mt-4 flex gap-3">
