@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+html, body, #__next { height: 100%; }
+body { @apply bg-n8n-bg text-n8n-text font-sans; }
+
+.bg-orb {
+  background: radial-gradient(1000px 600px at 80% -10%, rgba(255,122,24,0.12), transparent 50%),
+              radial-gradient(700px 400px at -10% 10%, rgba(109,75,224,0.18), transparent 60%);
+}
+
+.card { @apply bg-n8n-card/70 backdrop-blur border border-n8n-stroke rounded-xl2 shadow-glow transition hover:shadow-neon; }
+.input { @apply w-full bg-transparent border border-n8n-stroke/70 rounded-lg px-4 py-2 outline-none focus:border-n8n-accent focus:ring-1 focus:ring-n8n-accent placeholder-n8n-soft; }
+.btn { @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl2 border border-n8n-stroke/70 hover:border-n8n-accent transition shadow-glow; }
+.btn-primary { @apply btn bg-gradient-to-r from-n8n-accent to-n8n-accent2 text-white font-medium; }
+.btn-soft { @apply btn bg-n8n-card/60; }
+.tag { @apply text-xs px-2 py-0.5 rounded-full border border-n8n-stroke/60 bg-black/30 text-n8n-soft; }
+.linkish { @apply underline decoration-n8n-accent/60 underline-offset-4 hover:text-white; }
+.hover-raise { transform: translateY(0); transition: transform .25s ease; }
+.hover-raise:hover { transform: translateY(-2px); }
