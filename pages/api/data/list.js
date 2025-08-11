@@ -17,11 +17,12 @@ export default async function handler(req, res){
     // search by name, phone or template
     if (q) {
       const qLower = q.toLowerCase();
+      const digits = qLower.replace(/\D+/g, '');
       list = list.filter(r => (
         (r.nome || '').toLowerCase().includes(qLower) ||
-        (r.whatsapp || '').toLowerCase().includes(qLower) ||
         (r.nome2 || '').toLowerCase().includes(qLower) ||
-        (r.template || '').toLowerCase().includes(qLower)
+        (r.template || '').toLowerCase().includes(qLower) ||
+        (digits && (r.whatsapp || '').replace(/\D+/g, '').includes(digits))
       ));
     }
 
