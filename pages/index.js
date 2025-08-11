@@ -43,6 +43,8 @@ export default function Home() {
   const [importText, setImportText] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [triggering, setTriggering] = useState(false);
+  const [triggerError, setTriggerError] = useState('');
 
   const hidden = useMemo(() => new Set(readLocal('templatesHidden', [])), [tplTick]);
   const templates = useMemo(() => {
@@ -149,6 +151,20 @@ export default function Home() {
     } catch { setAuthed(false); }
   }
   async function logout() { await fetch('/api/logout'); setAuthed(false); }
+
+  async function triggerDisparos() {
+    setTriggering(true);
+    setTriggerError('');
+    try {
+      await fetchJSON('/api/n8n/trigger', { method: 'POST', body: JSON.stringify({}) });
+      await load();
+    } catch (err) {
+      console.error(err);
+      setTriggerError(err?.message || 'Falha ao disparar');
+    } finally {
+      setTriggering(false);
+    }
+  }
 
   function toggleTheme() {
     const next = theme === 'light' ? 'dark' : 'light';
@@ -270,8 +286,10 @@ export default function Home() {
                 <option value="pendente">Pendentes</option>
                 <option value="enviado">Enviados</option>
               </select>
+              <button className="btn-primary flex-shrink-0" onClick={triggerDisparos} disabled={triggering}>{triggering ? 'Disparando…' : 'DISPARAR'}</button>
             </div>
           </div>
+          {triggerError && (<div className="tag !text-red-300 !border-red-500/40 mb-4">{triggerError}</div>)}
 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
