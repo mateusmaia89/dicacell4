@@ -78,6 +78,11 @@ body{
 .btn-primary:hover{ filter: brightness(1.08); }
 .btn-primary:active{ transform: translateY(1px); }
 
+.btn-danger{
+  background-image: linear-gradient(92deg, #ff3c3c, #ff7a18);
+  box-shadow: 0 8px 22px rgba(255,60,60,0.35), 0 10px 30px rgba(255,122,24,0.22);
+}
+
 .btn-soft{
   display:inline-flex; align-items:center; justify-content:center;
   padding: 11px 18px; border-radius: 16px; font-weight:500;

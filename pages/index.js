@@ -277,9 +277,9 @@ export default function Home() {
         </section>
 
         <section className="card p-6 mt-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+          <div className="flex flex-col gap-3 mb-4 md:flex-row md:items-center">
             <h2 className="text-xl font-semibold">Envios</h2>
-            <div className="flex items-center gap-3 w-full">
+            <div className="flex items-center gap-3 flex-1">
               <input className="input w-full md:w-96" placeholder="Buscar por nome, telefone ou template" value={q} onChange={e => setQ(e.target.value)} />
               <select className="input w-48" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
                 <option value="__all__">Todos</option>
@@ -288,6 +288,13 @@ export default function Home() {
               </select>
               <button className="btn-primary flex-shrink-0" onClick={triggerDisparos} disabled={triggering}>{triggering ? 'Disparando…' : 'DISPARAR'}</button>
             </div>
+            <button
+              className="btn-primary btn-danger flex-shrink-0 self-end md:self-auto md:ml-auto"
+              onClick={triggerDisparos}
+              disabled={triggering}
+            >
+              {triggering ? 'Disparando…' : 'DISPARAR'}
+            </button>
           </div>
           {triggerError && (<div className="tag !text-red-300 !border-red-500/40 mb-4">{triggerError}</div>)}
 
