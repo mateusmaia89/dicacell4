@@ -1,14 +1,14 @@
 const encoder = new TextEncoder();
 
-// Lista de conexões abertas para o SSE
-const clients = new Set<ReadableStreamDefaultController>();
+// Mantém os controladores (conexões) ativos do SSE
+const clients = new Set<any>();
 
-export function sseRegister(controller: ReadableStreamDefaultController) {
+export function sseRegister(controller: any) {
   clients.add(controller);
   controller.enqueue(encoder.encode(': connected\n\n'));
 }
 
-export function sseUnregister(controller: ReadableStreamDefaultController) {
+export function sseUnregister(controller: any) {
   clients.delete(controller);
 }
 
