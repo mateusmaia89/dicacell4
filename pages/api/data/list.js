@@ -15,8 +15,8 @@ export default async function handler(req, res){
     }
 
     // search by name, phone or template
-    if (q) {
-      const qLower = q.toLowerCase();
+    const qLower = String(q || '').trim().toLowerCase();
+    if (qLower) {
       const digits = qLower.replace(/\D+/g, '');
       list = list.filter(r => {
         const phoneDigits = String(r.whatsapp || '').replace(/\D+/g, '');
