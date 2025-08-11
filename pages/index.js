@@ -195,8 +195,7 @@ export default function Home() {
           <div className="ml-auto text-right">
             <div className="text-sm text-n8n-soft">Enviados no período: {stats.enviados}</div>
             <div className="text-xl font-semibold">Total gasto (USD): $ {stats.custo?.toFixed ? stats.custo.toFixed(2) : '0.00'}</div>
-            <div className="text-xs text-n8n-soft">Cálculo: {stats.enviados} × $ 0.06</div>
-          </div>
+            </div>
         </section>
 
         <section className="card p-6 mt-6">
