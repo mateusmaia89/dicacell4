@@ -94,6 +94,17 @@ export default function Home() {
 
   useEffect(() => { if (authed) load(); }, [authed, statusFilter, from, to]);
 
+  useEffect(() => {
+    const cards = document.querySelectorAll('.card');
+    function handleMove(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      e.currentTarget.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+      e.currentTarget.style.setProperty('--my', `${e.clientY - rect.top}px`);
+    }
+    cards.forEach(c => c.addEventListener('mousemove', handleMove));
+    return () => cards.forEach(c => c.removeEventListener('mousemove', handleMove));
+  }, [list, stats, importOpen]);
+
   function addLocalTemplate(t) {
     const name = (t || '').trim();
     if (!name) return;
@@ -303,7 +314,7 @@ export default function Home() {
             </div>
           </div>
           <div className="flex justify-end mb-4">
-            <button className="btn-primary flex-shrink-0" onClick={triggerDisparos} disabled={triggering}>{triggering ? 'Disparando…' : 'DISPARAR'}</button>
+            <button className="btn-danger flex-shrink-0" onClick={triggerDisparos} disabled={triggering}>{triggering ? 'Disparando…' : 'DISPARAR'}</button>
           </div>
           {triggerError && (<div className="tag !text-red-300 !border-red-500/40 mb-4">{triggerError}</div>)}
 
@@ -330,7 +341,7 @@ export default function Home() {
                       <td className={td}>{r.whatsapp}</td>
                       <td className={td}><span className="mr-3">{r.template || '-'}</span></td>
                       <td className={td}>{r.nome2 || '-'}</td>
-                      <td className={td}><span className={`tag ${sent ? '!border-green-500/40 !text-green-300' : ''}`}>{r.status || 'pendente'}</span></td>
+                      <td className={td}><span className={`tag ${sent ? 'tag-sent' : ''}`}>{r.status || 'pendente'}</span></td>
                       <td className={td}>{created}</td>
                       <td className={td}><button className="btn-soft" onClick={() => delRecord(r.Id)}>excluir</button></td>
                     </tr>
