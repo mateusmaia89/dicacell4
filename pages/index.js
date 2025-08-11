@@ -202,7 +202,7 @@ export default function Home() {
           <h2 className="text-xl font-semibold mb-4">Novo envio</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Field label="Cliente"><input className="input" value={f.nome} onChange={e => setF(v => ({ ...v, nome: e.target.value }))} placeholder="Nome" /></Field>
-            <Field label="WhatsApp"><input className="input" value={f.whatsapp} onChange={e => setF(v => ({ ...v, whatsapp: e.target.value }))} placeholder="55DDD9XXXXXXXX" /></Field>
+            <Field label="WhatsApp"><input className="input" value={f.whatsapp} onChange={e => setF(v => ({ ...v, whatsapp: e.target.value }))} placeholder="55419XXXXXXXX" /></Field>
             <Field label="Indicação (opcional)"><input className="input" value={f.nome2} onChange={e => setF(v => ({ ...v, nome2: e.target.value }))} placeholder="Quem indicou" /></Field>
             <Field label="Template">
               <select

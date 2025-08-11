@@ -10,8 +10,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Campos obrigatórios: nome, whatsapp, template' });
     }
     const w = onlyDigits(whatsapp);
-    if (w.length < 10) return res.status(400).json({ error: 'WhatsApp inválido (use DDI+DDD+número)' });
-
+    if (!/^5541\d{9}$/.test(w)) {
+      return res.status(400).json({ error: 'WhatsApp deve ser 5541 + 9 dígitos (ex: 55419XXXXXXXX)' });
+    }
     const payload = { nome, whatsapp: w, nome2: nome2 || '', template, status: '' };
     const out = await ncFetch('/records', { method: 'POST', body: JSON.stringify(payload) });
     return res.status(201).json({ ok: true, record: out });
