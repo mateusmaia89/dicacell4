@@ -170,7 +170,9 @@ body{
   color:#fff; border: 1px solid rgba(255,255,255,0.06);
   transition: transform .1s ease, filter .2s ease, box-shadow .2s ease;
   box-shadow: 0 8px 22px rgba(124,58,237,0.35), 0 10px 30px rgba(255,122,24,0.22);
- text-transform: uppercase; letter-spacing:.02em; }
+  text-transform: uppercase; letter-spacing:.02em;
+  cursor: pointer;
+ }
 .btn-primary:hover{ filter: brightness(1.08); }
 .btn-primary:active{ transform: translateY(1px); }
 
@@ -182,6 +184,7 @@ body{
   transition: transform .1s ease, filter .2s ease, box-shadow .2s ease;
   box-shadow: 0 8px 22px rgba(255,60,172,0.35), 0 10px 30px rgba(255,82,47,0.25);
   text-transform: uppercase; letter-spacing:.02em;
+  cursor: pointer;
 }
 .btn-danger:hover{ filter: brightness(1.1); }
 .btn-danger:active{ transform: translateY(1px); }
@@ -193,6 +196,7 @@ body{
   border: 1px solid rgba(124,58,237,0.35);
   color: var(--fg);
   transition: transform .1s ease, border-color .15s ease, background .15s ease;
+  cursor: pointer;
 }
 .btn-soft:hover{ border-color: rgba(255,122,24,0.7); background: rgba(18,20,48,0.98); }
 .btn-soft:active{ transform: translateY(1px); }
