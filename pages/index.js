@@ -92,21 +92,22 @@ export default function Home() {
   }
 
   async function createOne(){
-    if (!f.nome || !f.whatsapp || !f.template) return;
-    const w = (f.whatsapp||'').replace(/\D+/g,'');
-    if (!/^5541\d{9}$/.test(w)) return;
-    setSubmitError(''); setSubmitLoading(true);
-    try{
-      const created = await fetchJSON('/api/data/create', { method:'POST', body: JSON.stringify({ ...f, whatsapp: w }) });
-      const optimistic = { Id: created?.record?.Id || Math.random(), nome: f.nome, whatsapp: w, nome2: f.nome2, template: f.template, status: '', CreatedAt: new Date().toISOString() };
-      setList(prev => [optimistic, ...prev]);
-      setF({ nome:'', whatsapp:'', nome2:'', template:'' });
-      await load();
-    }catch(err){
-    }finally{
-      setSubmitLoading(false);
-    }
+  if (!f.nome || !f.whatsapp || !f.template) return;
+  const w = (f.whatsapp||'').replace(/\D+/g,'');
+  if (!/^5541\d{9}$/.test(w)) return;
+  setSubmitLoading(true);
+  try{
+    const created = await fetchJSON('/api/data/create', { method:'POST', body: JSON.stringify({ ...f, whatsapp: w }) });
+    const rec = created?.record?.list?.[0] || created?.record || null;
+    const optimistic = { Id: rec?.Id || Math.random(), nome: f.nome, whatsapp: w, nome2: f.nome2, template: f.template, status: '', CreatedAt: new Date().toISOString() };
+    setList(prev => [optimistic, ...prev]);
+    setF({ nome:'', whatsapp:'', nome2:'', template:'' });
+    await load();
+  }catch(_){
+  }finally{
+    setSubmitLoading(false);
   }
+}
 
   async function delRecord(id){
     try{ await fetchJSON(`/api/data/delete?id=${id}`, { method:'DELETE' }); } finally { load(); }
