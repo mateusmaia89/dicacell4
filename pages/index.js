@@ -62,7 +62,7 @@ export default function Home() {
       (r.nome || '').toLowerCase().includes(term) ||
       (r.nome2 || '').toLowerCase().includes(term) ||
       (r.template || '').toLowerCase().includes(term) ||
-      (r.whatsapp || '').replace(/\D+/g, '').includes(digits)
+      (digits && (r.whatsapp || '').replace(/\D+/g, '').includes(digits))
     ));
   }, [list, q]);
 
