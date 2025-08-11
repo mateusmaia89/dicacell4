@@ -219,6 +219,8 @@ export default function Home() {
           <div className="mt-4 flex gap-3">
             <button className="btn-primary" disabled={submitLoading} onClick={createOne}>{submitLoading ? 'Enviando…' : 'Cadastrar'}</button>
             <button className="btn-soft" onClick={() => setImportOpen(true)}>Importar em massa</button>
+          
+            <button className="btn-soft" onClick={()=>triggerN8n({ action:'run' })}>Disparar n8n</button>
           </div>
         </section>
 
