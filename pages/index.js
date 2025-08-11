@@ -56,19 +56,18 @@ export default function Home(){
     if (!f.nome || !f.whatsapp || !f.template) { alert('Preencha: Cliente, WhatsApp, Template'); return; }
     try{
       const created = await fetchJSON('/api/data/create', { method: 'POST', body: JSON.stringify(f) });
-      const rec = created?.record?.list?.[0] || created?.record || null;
-      const optimistic = {
-        Id: rec?.Id || Math.random(),
-        nome: f.nome,
-        whatsapp: f.whatsapp,
-        nome2: f.nome2,
-        template: f.template,
-        status: '',
-        CreatedAt: new Date().toISOString()
-      };
-      setList(prev => [optimistic, ...prev]);
-      setF({ nome:'', whatsapp:'', nome2:'', template:'' });
-      await load();
+addLocalTemplate(f.template);
+setList(prev => [{
+  Id: created?.record?.Id || Math.random(),
+  nome: f.nome,
+  whatsapp: f.whatsapp,
+  nome2: f.nome2,
+  template: f.template,
+  status: '',
+  CreatedAt: new Date().toISOString()
+}, ...prev]);
+setF({ nome:'', whatsapp:'', nome2:'', template:'' });
+await load();
       alert('Cadastrado com sucesso');
     }catch(err){
       alert('Erro ao cadastrar: ' + (err?.message || err));
@@ -146,6 +145,22 @@ export default function Home(){
           <div className="card p-5"><div className="text-sm text-n8n-soft">Total</div><div className="text-4xl font-semibold mt-1">{stats.total}</div></div>
           <div className="card p-5"><div className="text-sm text-n8n-soft">Pendentes</div><div className="text-4xl font-semibold mt-1">{stats.pendentes}</div></div>
           <div className="card p-5"><div className="text-sm text-n8n-soft">Enviados</div><div className="text-4xl font-semibold mt-1">{stats.enviados}</div></div>
+        </section>
+
+        <section className="card p-5 mt-6">
+          <h2 className="text-xl font-semibold mb-3">Gerenciar templates</h2>
+          <div className="flex gap-2">
+            <input className="input flex-1" placeholder="Novo template" value={newTpl} onChange={e=>setNewTpl(e.target.value)} />
+            <button className="btn-primary" onClick={handleAddTemplate}>Adicionar</button>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {templates.length ? templates.map(t => (
+              <span key={t} className="tag flex items-center gap-2">
+                {t}
+                <button className="hover:!text-red-300" title="Remover este template da lista" onClick={()=>removeTemplate(t)}>🗑</button>
+              </span>
+            )) : <span className="text-sm text-n8n-soft">Sem templates.</span>}
+          </div>
         </section>
 
         <section className="card p-6 mt-6">
