@@ -54,6 +54,18 @@ export default function Home() {
     return Array.from(uniq).filter(t => !hidden.has(t));
   }, [list, tplTick, hidden]);
 
+  const filteredList = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    if (!term) return list;
+    const digits = term.replace(/\D+/g, '');
+    return list.filter(r => (
+      (r.nome || '').toLowerCase().includes(term) ||
+      (r.nome2 || '').toLowerCase().includes(term) ||
+      (r.template || '').toLowerCase().includes(term) ||
+      (r.whatsapp || '').replace(/\D+/g, '').includes(digits)
+    ));
+  }, [list, q]);
+
   useEffect(() => {
     try {
       const saved = typeof window !== 'undefined' ? (localStorage.getItem('theme') || 'dark') : 'dark';
@@ -69,8 +81,10 @@ export default function Home() {
   async function load() {
     setLoading(true);
     try {
-      const st = (statusFilter && statusFilter !== '__all__') ? `&status=${statusFilter}` : '';
-      const l = await fetchJSON(`/api/data/list?q=${encodeURIComponent(q)}${st}`);
+      const params = new URLSearchParams();
+      if (statusFilter && statusFilter !== '__all__') params.append('status', statusFilter);
+      const qs = params.toString();
+      const l = await fetchJSON(`/api/data/list${qs ? `?${qs}` : ''}`);
       setList(l.list || []);
       try { const m = await fetchJSON(`/api/data/metrics?from=${from}&to=${to}`); setStats(m); } catch {}
     } finally {
@@ -78,7 +92,7 @@ export default function Home() {
     }
   }
 
-  useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
+  useEffect(() => { if (authed) load(); }, [authed, statusFilter, from, to]);
 
   function addLocalTemplate(t) {
     const name = (t || '').trim();
@@ -307,7 +321,7 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody>
-                {list.map(r => {
+                {filteredList.map(r => {
                   const sent = (r.status || '').toLowerCase() === 'enviado';
                   const created = r.CreatedAt ? new Date(r.CreatedAt).toLocaleString('pt-BR') : '-';
                   return (
@@ -322,7 +336,7 @@ export default function Home() {
                     </tr>
                   );
                 })}
-                {!list.length && (<tr><td className="px-4 py-8 text-n8n-soft" colSpan={7}>Sem registros.</td></tr>)}
+                {!filteredList.length && (<tr><td className="px-4 py-8 text-n8n-soft" colSpan={7}>Sem registros.</td></tr>)}
               </tbody>
             </table>
           </div>
