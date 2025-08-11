@@ -176,17 +176,23 @@ export default function Home() {
           <div className="card p-5"><div className="text-sm text-n8n-soft">Total gasto (USD)</div><div className="text-4xl font-semibold mt-1">$ {stats.custo?.toFixed ? stats.custo.toFixed(2) : '0.00'}</div></div>
         </section>
 
-        <section className="card p-5 mt-4 flex flex-wrap items-center gap-4">
-          <Field label="De"><input type="date" className="input" value={from} onChange={e=>setFrom(e.target.value)} /></Field>
-          <Field label="Até"><input type="date" className="input" value={to} onChange={e=>setTo(e.target.value)} /></Field>
+        <section className="card p-5 mt-4 flex flex-wrap items-end gap-4">
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-n8n-soft">De</label>
+            <input type="date" className="input h-[46px]" value={from} onChange={e=>setFrom(e.target.value)} />
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-sm text-n8n-soft">Até</label>
+            <input type="date" className="input h-[46px]" value={to} onChange={e=>setTo(e.target.value)} />
+          </div>
           <div className="flex items-end gap-2">
-            <button className="btn-soft" onClick={()=>{const n=new Date(); const d=n.toISOString().slice(0,10); setFrom(d); setTo(d);}}>Hoje</button>
-            <button className="btn-soft" onClick={()=>{const n=new Date(); const toD=n.toISOString().slice(0,10); const a=new Date(n); a.setDate(n.getDate()-6); const fromD=a.toISOString().slice(0,10); setFrom(fromD); setTo(toD);}}>7 dias</button>
-            <button className="btn-soft" onClick={()=>{const n=new Date(); const toD=n.toISOString().slice(0,10); const a=new Date(n); a.setDate(n.getDate()-29); const fromD=a.toISOString().slice(0,10); setFrom(fromD); setTo(toD);}}>30 dias</button>
+            <button className="btn-soft h-[46px]" onClick={()=>{const n=new Date(); const d=n.toISOString().slice(0,10); setFrom(d); setTo(d);}}>Hoje</button>
+            <button className="btn-soft h-[46px]" onClick={()=>{const n=new Date(); const toD=n.toISOString().slice(0,10); const a=new Date(n); a.setDate(n.getDate()-6); const fromD=a.toISOString().slice(0,10); setFrom(fromD); setTo(toD);}}>7 dias</button>
+            <button className="btn-soft h-[46px]" onClick={()=>{const n=new Date(); const toD=n.toISOString().slice(0,10); const a=new Date(n); a.setDate(n.getDate()-29); const fromD=a.toISOString().slice(0,10); setFrom(fromD); setTo(toD);}}>30 dias</button>
           </div>
           <div className="ml-auto">
             <button
-              className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 text-white shadow-neon hover:opacity-90 transition"
+              className="px-6 h-[46px] rounded-2xl bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 text-white shadow-neon hover:opacity-90 transition btn-primary"
               onClick={()=>triggerN8n({ action:'run', from, to })}
             >
               DISPARAR
