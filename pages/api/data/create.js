@@ -8,10 +8,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Campos obrigatórios: nome, whatsapp, template' });
     }
     const payload = { nome, whatsapp, nome2: nome2 || '', template, status: '' };
-    const out = await ncFetch('/records', {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
+    const out = await ncFetch('/records', { method: 'POST', body: JSON.stringify(payload) });
     return res.status(201).json({ ok: true, record: out });
   } catch (e) {
     return res.status(500).json({ error: e.message || 'erro ao criar' });

@@ -34,8 +34,8 @@ export default function Home(){
 
   async function load(){
     const [m, l] = await Promise.all([
-      fetchJSON(`/api/nocodb/metrics?from=${from}&to=${to}`),
-      fetchJSON(`/api/nocodb/list?from=${from}&to=${to}&q=${encodeURIComponent(q)}&status=${statusFilter}`)
+      fetchJSON(`/api/data/metrics?from=${from}&to=${to}`),
+      fetchJSON(`/api/data/list?from=${from}&to=${to}&q=${encodeURIComponent(q)}&status=${statusFilter}`)
     ]);
     setStats(m); setList(l.list||[]);
   }
@@ -53,16 +53,32 @@ export default function Home(){
   }
 
   async function createOne(){
-    if (!f.nome || !f.whatsapp || !f.template) return alert('Preencha: Cliente, WhatsApp, Template');
-    await fetchJSON('/api/nocodb/create', { method: 'POST', body: JSON.stringify(f) });
-    addLocalTemplate(f.template);
-    setF({ nome:'', whatsapp:'', nome2:'', template:'' });
-    load();
+    if (!f.nome || !f.whatsapp || !f.template) { alert('Preencha: Cliente, WhatsApp, Template'); return; }
+    try{
+      const created = await fetchJSON('/api/data/create', { method: 'POST', body: JSON.stringify(f) });
+      const rec = created?.record?.list?.[0] || created?.record || null;
+      const optimistic = {
+        Id: rec?.Id || Math.random(),
+        nome: f.nome,
+        whatsapp: f.whatsapp,
+        nome2: f.nome2,
+        template: f.template,
+        status: '',
+        CreatedAt: new Date().toISOString()
+      };
+      setList(prev => [optimistic, ...prev]);
+      setF({ nome:'', whatsapp:'', nome2:'', template:'' });
+      await load();
+      alert('Cadastrado com sucesso');
+    }catch(err){
+      alert('Erro ao cadastrar: ' + (err?.message || err));
+      console.error('createOne error:', err);
+    }
   }
 
   async function delRecord(id){
     if (!confirm('Excluir este registro?')) return;
-    await fetchJSON(`/api/nocodb/delete?id=${id}`, { method:'DELETE' });
+    await fetchJSON(`/api/data/delete?id=${id}`, { method:'DELETE' });
     load();
   }
 
@@ -89,7 +105,7 @@ export default function Home(){
   async function doImport(){
     const rows = parseRows();
     if (!rows.length) return alert('Nada para importar');
-    await fetchJSON('/api/nocodb/bulk', { method:'POST', body: JSON.stringify({ rows }) });
+    await fetchJSON('/api/data/bulk', { method:'POST', body: JSON.stringify({ rows }) });
     rows.forEach(r=>r.template && addLocalTemplate(r.template));
     setImportOpen(false); setImportText(''); load();
   }
