@@ -286,8 +286,10 @@ export default function Home() {
                 <option value="pendente">Pendentes</option>
                 <option value="enviado">Enviados</option>
               </select>
-              <button className="btn-primary flex-shrink-0" onClick={triggerDisparos} disabled={triggering}>{triggering ? 'Disparando…' : 'DISPARAR'}</button>
             </div>
+          </div>
+          <div className="flex justify-end mb-4">
+            <button className="btn-primary flex-shrink-0" onClick={triggerDisparos} disabled={triggering}>{triggering ? 'Disparando…' : 'DISPARAR'}</button>
           </div>
           {triggerError && (<div className="tag !text-red-300 !border-red-500/40 mb-4">{triggerError}</div>)}
 
