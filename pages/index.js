@@ -91,36 +91,25 @@ export default function Home() {
     setNewTpl('');
   }
 
-  async function createOne() {
-    if (!f.nome || !f.whatsapp || !f.template) { alert('Preencha: Cliente, WhatsApp, Template'); return; }
-    setSubmitError('');
-    setSubmitLoading(true);
-    try {
-      const created = await fetchJSON('/api/data/create', { method: 'POST', body: JSON.stringify(f) });
-      const optimistic = {
-        Id: created?.record?.Id || Math.random(),
-        nome: f.nome,
-        whatsapp: f.whatsapp,
-        nome2: f.nome2,
-        template: f.template,
-        status: '',
-        CreatedAt: new Date().toISOString()
-      };
-      addLocalTemplate(f.template);
+  async function createOne(){
+    if (!f.nome || !f.whatsapp || !f.template) return;
+    const w = (f.whatsapp||'').replace(/\D+/g,'');
+    if (!/^5541\d{9}$/.test(w)) return;
+    setSubmitError(''); setSubmitLoading(true);
+    try{
+      const created = await fetchJSON('/api/data/create', { method:'POST', body: JSON.stringify({ ...f, whatsapp: w }) });
+      const optimistic = { Id: created?.record?.Id || Math.random(), nome: f.nome, whatsapp: w, nome2: f.nome2, template: f.template, status: '', CreatedAt: new Date().toISOString() };
       setList(prev => [optimistic, ...prev]);
-      setF({ nome: '', whatsapp: '', nome2: '', template: '' });
+      setF({ nome:'', whatsapp:'', nome2:'', template:'' });
       await load();
-    } catch (err) {
-      setSubmitError(err?.message || 'Falha ao cadastrar');
-    } finally {
+    }catch(err){
+    }finally{
       setSubmitLoading(false);
     }
   }
 
-  async function delRecord(id) {
-    if (!confirm('Excluir este registro?')) return;
-    await fetchJSON(`/api/data/delete?id=${id}`, { method: 'DELETE' });
-    load();
+  async function delRecord(id){
+    try{ await fetchJSON(`/api/data/delete?id=${id}`, { method:'DELETE' }); } finally { load(); }
   }
 
   function parseRows() {
@@ -136,16 +125,16 @@ export default function Home() {
   }
   async function doImport() {
     const rows = parseRows();
-    if (!rows.length) return alert('Nada para importar');
+    if (!rows.length) return;
     await fetchJSON('/api/data/bulk', { method: 'POST', body: JSON.stringify({ rows }) });
     rows.forEach(r => r.template && addLocalTemplate(r.template));
     setImportOpen(false); setImportText(''); load();
   }
 
   const [cred, setCred] = useState({ user: '', pass: '' });
-  async function login() {
-    const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cred) });
-    if (r.ok) setAuthed(true); else alert('Login inválido');
+  async function login(){
+    const r = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(cred) });
+    if (r.ok) setAuthed(true);
   }
   async function logout() { await fetch('/api/logout'); setAuthed(false); }
 
@@ -228,8 +217,7 @@ export default function Home() {
             </Field>
           </div>
           <div className="mt-3">
-            {submitError && (<div className="tag !text-red-300 !border-red-500/40 mb-3">{submitError}</div>)}
-          </div>
+                      </div>
           <div className="mt-4 flex gap-3">
             <button className="btn-primary" disabled={submitLoading} onClick={createOne}>{submitLoading ? 'Enviando…' : 'Cadastrar'}</button>
             <button className="btn-soft" onClick={() => setImportOpen(true)}>Importar em massa</button>
