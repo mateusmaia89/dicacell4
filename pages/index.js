@@ -131,7 +131,7 @@ export default function Home() {
     setImportOpen(false); setImportText(''); load();
   }
 
-  const [cred, setCred] = useState({ user: '', pass: '' });
+  const [cred, setCred] = useState({ user: 'dicacell', pass: '@Dica007' });
   async function login(){
     const r = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(cred) });
     if (r.ok) setAuthed(true);
@@ -145,11 +145,9 @@ export default function Home() {
           <h1 className="text-2xl font-semibold">Portal de Envios</h1>
           <p className="text-sm text-n8n-soft mt-2">Faça login para acessar.</p>
           <div className="mt-6 grid gap-4">
-            <Field label="Usuário"><input className="input" value={cred.user} onChange={e => setCred(v => ({ ...v, user: e.target.value }))} placeholder="admin" /></Field>
-            <Field label="Senha"><input className="input" type="password" value={cred.pass} onChange={e => setCred(v => ({ ...v, pass: e.target.value }))} placeholder="admin123" /></Field>
-            <button className="btn-primary" onClick={login}>Entrar</button>
-            <p className="text-xs text-n8n-soft">Dica: admin / admin123</p>
-          </div>
+            <Field label="Usuário"><input className="input" value={cred.user} onChange={e => setCred(v => ({ ...v, user: e.target.value }))} placeholder="Usuário" /></Field>
+            <Field label="Senha"><input className="input" type="password" value={cred.pass} onChange={e => setCred(v => ({ ...v, pass: e.target.value }))} placeholder="Senha" /></Field>
+            <button className="btn-primary" onClick={login}>Entrar</button></div>
         </div>
       </div>
     );
