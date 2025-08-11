@@ -54,23 +54,6 @@ export default function Home() {
     return Array.from(uniq).filter(t => !hidden.has(t));
   }, [list, tplTick, hidden]);
 
-  const filteredList = useMemo(() => {
-    const src = Array.isArray(list) ? list : [];
-    const term = String(q || '').trim().toLowerCase();
-    if (!term) return src;
-    const digits = term.replace(/\D+/g, '');
-    return src.filter(r => {
-      if (!r) return false;
-      const phoneDigits = String(r.whatsapp || '').replace(/\D+/g, '');
-      return (
-        (r.nome || '').toLowerCase().includes(term) ||
-        (r.nome2 || '').toLowerCase().includes(term) ||
-        (r.template || '').toLowerCase().includes(term) ||
-        (digits && phoneDigits.includes(digits))
-      );
-    });
-  }, [list, q]);
-
   useEffect(() => {
     try {
       const saved = typeof window !== 'undefined' ? (localStorage.getItem('theme') || 'dark') : 'dark';
@@ -88,6 +71,8 @@ export default function Home() {
     try {
       const params = new URLSearchParams();
       if (statusFilter && statusFilter !== '__all__') params.append('status', statusFilter);
+      const search = String(q || '').trim();
+      if (search) params.append('q', search);
       const qs = params.toString();
       const l = await fetchJSON(`/api/data/list${qs ? `?${qs}` : ''}`);
       setList(Array.isArray(l.list) ? l.list : []);
@@ -100,7 +85,7 @@ export default function Home() {
     }
   }
 
-  useEffect(() => { if (authed) load(); }, [authed, statusFilter, from, to]);
+  useEffect(() => { if (authed) load(); }, [authed, statusFilter, from, to, q]);
 
   function addLocalTemplate(t) {
     const name = (t || '').trim();
@@ -339,7 +324,7 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody>
-                {filteredList.map(r => {
+                {list.map(r => {
                   const sent = (r.status || '').toLowerCase() === 'enviado';
                   const created = r.CreatedAt ? new Date(r.CreatedAt).toLocaleString('pt-BR') : '-';
                   return (
@@ -354,7 +339,7 @@ export default function Home() {
                     </tr>
                   );
                 })}
-                {!filteredList.length && (<tr><td className="px-4 py-8 text-n8n-soft" colSpan={7}>Sem registros.</td></tr>)}
+                {!list.length && (<tr><td className="px-4 py-8 text-n8n-soft" colSpan={7}>Sem registros.</td></tr>)}
               </tbody>
             </table>
           </div>
