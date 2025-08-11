@@ -42,6 +42,7 @@ export default function Home() {
   const [importOpen, setImportOpen] = useState(false);
   const [importText, setImportText] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
+  const [n8nLoading, setN8nLoading] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
   const hidden = useMemo(() => new Set(readLocal('templatesHidden', [])), [tplTick]);
