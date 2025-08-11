@@ -1,6 +1,6 @@
-import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
 import { useEffect, useMemo, useState } from 'react';
 import { Field } from '../components/Field';
+import { SunIcon, MoonIcon } from '@heroicons/react/24/solid';
 
 const fetchJSON = async (url, init) => {
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...init });
@@ -33,7 +33,7 @@ export default function Home() {
   const [stats, setStats] = useState({ total: 0, pendentes: 0, enviados: 0, custo: 0 });
   const [list, setList] = useState([]);
   const [q, setQ] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('__all__');
 
   const [f, setF] = useState({ nome: '', whatsapp: '', nome2: '', template: '' });
 
@@ -42,7 +42,6 @@ export default function Home() {
   const [importOpen, setImportOpen] = useState(false);
   const [importText, setImportText] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
-  const [n8nLoading, setN8nLoading] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
   const hidden = useMemo(() => new Set(readLocal('templatesHidden', [])), [tplTick]);
@@ -53,22 +52,31 @@ export default function Home() {
     return Array.from(uniq).filter(t => !hidden.has(t));
   }, [list, tplTick, hidden]);
 
+  useEffect(() => {
+    try {
+      const saved = typeof window !== 'undefined' ? (localStorage.getItem('theme') || 'dark') : 'dark';
+      document.documentElement.setAttribute('data-theme', saved);
+      setTheme(saved);
+    } catch {}
+  }, []);
+
+  useEffect(() => { (async () => {
+    try { const r = await fetch('/api/login'); setAuthed(r.ok); } catch { setAuthed(false); }
+  })(); }, []);
+
   async function load() {
     setLoading(true);
     try {
-      const [m, l] = await Promise.all([
-        fetchJSON(`/api/data/metrics?from=${from}&to=${to}`),
-        fetchJSON(`/api/data/list?q=${encodeURIComponent(q)}&status=${statusFilter}`)
-      ]);
-      setStats(m);
+      const st = (statusFilter && statusFilter !== '__all__') ? `&status=${statusFilter}` : '';
+      const l = await fetchJSON(`/api/data/list?q=${encodeURIComponent(q)}${st}`);
       setList(l.list || []);
+      try { const m = await fetchJSON(`/api/data/metrics?from=${from}&to=${to}`); setStats(m); } catch {}
     } finally {
       setLoading(false);
     }
   }
 
-  useEffect(() => { (async()=>{ try{ const r = await fetch('/api/login'); setAuthed(r.ok); }catch{ setAuthed(false); } })(); }, []);
-useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
+  useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
 
   function addLocalTemplate(t) {
     const name = (t || '').trim();
@@ -89,52 +97,44 @@ useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
     writeLocal('templatesHidden', hid);
     setTplTick(x => x + 1);
   }
+
   function handleAddTemplate() {
     if (!newTpl.trim()) return;
     addLocalTemplate(newTpl.trim());
     setNewTpl('');
   }
 
-  async function createOne(){
-  const name = (f.nome||'').trim();
-  const tpl = (f.template||'').trim();
-  const w = (f.whatsapp||'').replace(/\D+/g,'');
-  if (!name || !w || !tpl) { setSubmitError('Preencha: Cliente, WhatsApp e Template'); return; }
-  if (!/^5541\d{9}$/.test(w)) { setSubmitError('WhatsApp inválido. Use 5541 + 9 dígitos (ex: 55419XXXXXXXX)'); return; }
-  setSubmitError(''); setSubmitLoading(true);
-  try{
-    const created = await fetchJSON('/api/data/create', { method:'POST', body: JSON.stringify({ ...f, nome:name, whatsapp:w, template:tpl }) });
-    const rec = created?.record?.list?.[0] || created?.record || null;
-    const id = rec?.Id || Math.random();
-    const optimistic = { Id:id, nome:name, whatsapp:w, nome2:f.nome2, template:tpl, status:'', CreatedAt:new Date().toISOString() };
-    setList(prev => [optimistic, ...prev]);
-    setF({ nome:'', whatsapp:'', nome2:'', template:'' });
-    await load();
-  }catch(err){
-    setSubmitError(err?.message || 'Falha ao cadastrar');
-  }finally{
-    setSubmitLoading(false);
-  }
-}
-}
-
-  async function delRecord(id){
-    try{ await fetchJSON(`/api/data/delete?id=${id}`, { method:'DELETE' }); } finally { load(); }
+  async function createOne() {
+    const name = (f.nome || '').trim();
+    const tpl = (f.template || '').trim();
+    const w = (f.whatsapp || '').replace(/\D+/g, '');
+    if (!name || !w || !tpl) { setSubmitError('Preencha: Cliente, WhatsApp e Template'); return; }
+    if (!/^5541\d{9}$/.test(w)) { setSubmitError('WhatsApp inválido. Use 5541 + 9 dígitos (ex: 55419XXXXXXXX)'); return; }
+    setSubmitError(''); setSubmitLoading(true);
+    try {
+      const created = await fetchJSON('/api/data/create', { method: 'POST', body: JSON.stringify({ ...f, nome: name, whatsapp: w, template: tpl }) });
+      const rec = created?.record?.list?.[0] || created?.record || null;
+      const id = rec?.Id || Math.random();
+      const optimistic = { Id: id, nome: name, whatsapp: w, nome2: f.nome2, template: tpl, status: '', CreatedAt: new Date().toISOString() };
+      setList(prev => [optimistic, ...prev]);
+      setF({ nome: '', whatsapp: '', nome2: '', template: '' });
+      await load();
+    } catch (err) {
+      setSubmitError(err?.message || 'Falha ao cadastrar');
+    } finally {
+      setSubmitLoading(false);
+    }
   }
 
-  function parseRows() {
+  async function doImport() {
     const lines = importText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-    if (!lines.length) return [];
+    if (!lines.length) return;
     const header = lines[0].toLowerCase();
     const hasHeader = /cliente|whatsapp|indica|template/.test(header);
     const rows = (hasHeader ? lines.slice(1) : lines).map(l => {
       const parts = l.split(/,|;|\t/).map(s => s.trim());
-      return { nome: parts[0] || '', whatsapp: parts[1] || '', nome2: parts[2] || '', template: parts[3] || '' };
-    }).filter(r => r.nome && r.whatsapp);
-    return rows;
-  }
-  async function doImport() {
-    const rows = parseRows();
+      return { nome: parts[0] || '', whatsapp: (parts[1] || '').replace(/\D+/g, ''), nome2: parts[2] || '', template: parts[3] || '' };
+    }).filter(r => r.nome && /^5541\d{9}$/.test(r.whatsapp));
     if (!rows.length) return;
     await fetchJSON('/api/data/bulk', { method: 'POST', body: JSON.stringify({ rows }) });
     rows.forEach(r => r.template && addLocalTemplate(r.template));
@@ -142,11 +142,19 @@ useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
   }
 
   const [cred, setCred] = useState({ user: 'dicacell', pass: '@Dica007' });
-  async function login(){
-    const r = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(cred) });
-    if (r.ok) setAuthed(true);
+  async function login() {
+    try {
+      const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(cred) });
+      if (r.ok) setAuthed(true); else setAuthed(false);
+    } catch { setAuthed(false); }
   }
   async function logout() { await fetch('/api/logout'); setAuthed(false); }
+
+  function toggleTheme() {
+    const next = theme === 'light' ? 'dark' : 'light';
+    try { document.documentElement.setAttribute('data-theme', next); localStorage.setItem('theme', next); } catch {}
+    setTheme(next);
+  }
 
   if (authed !== true) {
     return (
@@ -157,17 +165,13 @@ useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
           <div className="mt-6 grid gap-4">
             <Field label="Usuário"><input className="input" value={cred.user} onChange={e => setCred(v => ({ ...v, user: e.target.value }))} placeholder="Usuário" /></Field>
             <Field label="Senha"><input className="input" type="password" value={cred.pass} onChange={e => setCred(v => ({ ...v, pass: e.target.value }))} placeholder="Senha" /></Field>
-            <button className="btn-primary" onClick={login}>Entrar</button></div>
+            <button className="btn-primary" onClick={login}>Entrar</button>
+          </div>
         </div>
       </div>
     );
   }
 
-  function toggleTheme(){
-    const next = theme==='light' ? 'dark' : 'light';
-    try{ document.documentElement.setAttribute('data-theme', next); localStorage.setItem('theme', next); }catch{}
-    setTheme(next);
-  }
   const th = "px-4 py-3 text-left text-xs font-semibold tracking-wider text-n8n-soft uppercase";
   const td = "px-4 py-4 border-t border-n8n-stroke/40";
 
@@ -183,8 +187,8 @@ useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
         </div>
         <div className="flex items-center gap-2">
           <button className="p-2 rounded-lg hover:bg-white/5 transition" onClick={toggleTheme} aria-label="Alternar tema">
-  {theme==='light' ? <MoonIcon className="h-5 w-5 text-n8n-soft" /> : <SunIcon className="h-5 w-5 text-n8n-soft" />}
-</button>
+            {theme === 'light' ? <MoonIcon className="h-5 w-5 text-n8n-soft" /> : <SunIcon className="h-5 w-5 text-n8n-soft" />}
+          </button>
           <button className="btn-soft" onClick={logout}>Sair</button>
         </div>
       </header>
@@ -199,24 +203,16 @@ useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
         <section className="card p-5 mt-4 flex flex-wrap items-end gap-4">
           <div className="flex flex-col gap-1">
             <label className="text-sm text-n8n-soft">De</label>
-            <input type="date" className="input h-[46px]" value={from} onChange={e=>setFrom(e.target.value)} />
+            <input type="date" className="input h-[46px]" value={from} onChange={e => setFrom(e.target.value)} />
           </div>
           <div className="flex flex-col gap-1">
             <label className="text-sm text-n8n-soft">Até</label>
-            <input type="date" className="input h-[46px]" value={to} onChange={e=>setTo(e.target.value)} />
+            <input type="date" className="input h-[46px]" value={to} onChange={e => setTo(e.target.value)} />
           </div>
           <div className="flex items-end gap-2">
-            <button className="btn-soft h-[46px]" onClick={()=>{const n=new Date(); const d=n.toISOString().slice(0,10); setFrom(d); setTo(d);}}>Hoje</button>
-            <button className="btn-soft h-[46px]" onClick={()=>{const n=new Date(); const toD=n.toISOString().slice(0,10); const a=new Date(n); a.setDate(n.getDate()-6); const fromD=a.toISOString().slice(0,10); setFrom(fromD); setTo(toD);}}>7 dias</button>
-            <button className="btn-soft h-[46px]" onClick={()=>{const n=new Date(); const toD=n.toISOString().slice(0,10); const a=new Date(n); a.setDate(n.getDate()-29); const fromD=a.toISOString().slice(0,10); setFrom(fromD); setTo(toD);}}>30 dias</button>
-          </div>
-          <div className="ml-auto">
-            <button
-              className="px-6 h-[46px] rounded-2xl bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 text-white shadow-neon hover:opacity-90 transition btn-primary"
-              onClick={()=>triggerN8n({ action:'run', from, to })}
-            >
-              DISPARAR
-            </button>
+            <button className="btn-soft h-[46px]" onClick={() => { const n = new Date(); const d = n.toISOString().slice(0, 10); setFrom(d); setTo(d); }}>Hoje</button>
+            <button className="btn-soft h-[46px]" onClick={() => { const n = new Date(); const toD = n.toISOString().slice(0, 10); const a = new Date(n); a.setDate(n.getDate() - 6); const fromD = a.toISOString().slice(0, 10); setFrom(fromD); setTo(toD); }}>7 dias</button>
+            <button className="btn-soft h-[46px]" onClick={() => { const n = new Date(); const toD = n.toISOString().slice(0, 10); const a = new Date(n); a.setDate(n.getDate() - 29); const fromD = a.toISOString().slice(0, 10); setFrom(fromD); setTo(toD); }}>30 dias</button>
           </div>
         </section>
 
@@ -229,53 +225,51 @@ useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
             <Field label="Template">
               <div className="flex gap-2 items-center">
                 <select
-                className="input"
-                value={f.template}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === '__add__') {
-                    if (typeof window !== 'undefined') {
-                      const t = window.prompt('Nome do novo template');
-                      if (t && t.trim()) { addLocalTemplate(t.trim()); setF(v => ({ ...v, template: t.trim() })); }
-                      else { setF(v => ({ ...v, template: '' })); }
+                  className="input"
+                  value={f.template}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '__add__') {
+                      if (typeof window !== 'undefined') {
+                        const t = window.prompt('Nome do novo template');
+                        if (t && t.trim()) { addLocalTemplate(t.trim()); setF(v => ({ ...v, template: t.trim() })); }
+                        else { setF(v => ({ ...v, template: '' })); }
+                      }
+                    } else {
+                      setF(v => ({ ...v, template: val }));
                     }
-                  } else {
-                    setF(v => ({ ...v, template: val }));
-                  }
-                }}
-              >
-                <option value="">Selecione…</option>
-                {templates.map(t => <option key={t} value={t}>{t}</option>)}
-                <option value="__add__">+ Adicionar novo template…</option>
-              </select>
+                  }}
+                >
+                  <option value="">Selecione…</option>
+                  {templates.map(t => <option key={t} value={t}>{t}</option>)}
+                  <option value="__add__">+ Adicionar novo template…</option>
+                </select>
                 <button
                   className="px-3 py-2 rounded-xl border border-red-500/40 text-red-300 hover:bg-red-500/10 disabled:opacity-40"
                   disabled={!f.template}
                   title="Remover este template da lista"
-                  onClick={()=>{ if(f.template){ removeTemplate(f.template); setF(v=>({...v, template:''})); } }}
+                  onClick={() => { if (f.template) { removeTemplate(f.template); setF(v => ({ ...v, template: '' })); } }}
                 >🗑</button>
               </div>
             </Field>
           </div>
           <div className="mt-3">{submitError && (<div className="tag !text-red-300 !border-red-500/40 mb-3">{submitError}</div>)}</div>
-<div className="mt-4 flex flex-wrap gap-3">
+          <div className="mt-4 flex flex-wrap gap-3">
             <button className="btn-primary" disabled={submitLoading} onClick={createOne}>{submitLoading ? 'Enviando…' : 'Cadastrar'}</button>
             <button className="btn-soft" onClick={() => setImportOpen(true)}>Importar em massa</button>
-          
-            
           </div>
         </section>
 
         <section className="card p-6 mt-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
             <h2 className="text-xl font-semibold">Envios</h2>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 w-full">
               <input className="input w-full md:w-96" placeholder="Buscar por nome, telefone ou template" value={q} onChange={e => setQ(e.target.value)} />
               <select className="input w-48" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-  <option value="__all__">Todos</option>
-  <option value="pendente">Pendentes</option>
-  <option value="enviado">Enviados</option>
-</select>
+                <option value="__all__">Todos</option>
+                <option value="pendente">Pendentes</option>
+                <option value="enviado">Enviados</option>
+              </select>
             </div>
           </div>
 
