@@ -27,7 +27,7 @@ export default function Home(){
 
   const templates = useMemo(()=>{
     const uniq = new Set(list.map(r=>r.template).filter(Boolean));
-    const local = (typeof window !== 'undefined' && JSON.parse(localStorage.getItem('templates')||'[]')) || [];
+    const local = (typeof window !== 'undefined' && JSON.parse((typeof window!=='undefined'? (localStorage.getItem('templates')||'[]') : '[]'))) || [];
     local.forEach(t=>uniq.add(t));
     return Array.from(uniq).filter(t=>!hidden.has(t));
   }, [list, tplTick, hidden]);
@@ -42,12 +42,12 @@ export default function Home(){
   useEffect(()=>{ if(authed) load(); }, [authed, q, statusFilter, from, to]);
 
   function addLocalTemplate(t){
-    const cur = JSON.parse(localStorage.getItem('templates')||'[]');
+    const cur = JSON.parse((typeof window!=='undefined'? (localStorage.getItem('templates')||'[]') : '[]'));
     if (!cur.includes(t)) localStorage.setItem('templates', JSON.stringify([...cur, t]));
     setTplTick(x=>x+1);
   }
   function hideTemplate(t){
-    const cur = JSON.parse(localStorage.getItem('templatesHidden')||'[]');
+    const cur = JSON.parse((typeof window!=='undefined'? (localStorage.getItem('templatesHidden')||'[]') : '[]'));
     if (!cur.includes(t)) localStorage.setItem('templatesHidden', JSON.stringify([...cur, t]));
     setTplTick(x=>x+1);
   }
@@ -176,7 +176,7 @@ await load();
                 onChange={(e)=>{
                   const val = e.target.value;
                   if (val === '__add__') {
-                    const t = window.prompt('Nome do novo template');
+                    let t=null; if (typeof window!=='undefined') { t = window.prompt('Nome do novo template'); }
                     if (t && t.trim()) { addLocalTemplate(t.trim()); setF(v=>({...v, template: t.trim()})); }
                     else { setF(v=>({...v, template: ''})); }
                   } else {
