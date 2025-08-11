@@ -2,12 +2,35 @@ import { ncFetch } from '../../../lib/nocodb';
 export default async function handler(req, res){
   try {
     const { q = '', status = '' } = req.query;
-    const where = [];
-    if (status === 'enviado') where.push(`status,eq,enviado`);
-    if (status === 'pendente') where.push(`or((status,eq,), (status,is,null))`);
-    if (q) where.push(`or((nome,like,${encodeURIComponent('%'+q+'%')}),(whatsapp,like,${encodeURIComponent('%'+q+'%')}),(nome2,like,${encodeURIComponent('%'+q+'%')}),(template,like,${encodeURIComponent('%'+q+'%')}))`);
-    const qs = where.length ? `?where=${where.join('~and~')}&limit=999` : '?limit=999';
-    const data = await ncFetch(`/records${qs}`);
-    res.json({ list: data.list || [] });
-  } catch(e){ res.status(500).json({ error: e.message }); }
+
+    // fetch all records first; dataset is small (limit 999)
+    const data = await ncFetch(`/records?limit=999`);
+    let list = data.list || [];
+
+    // filter by status
+    if (status === 'enviado') {
+      list = list.filter(r => (r.status || '').toLowerCase() === 'enviado');
+    } else if (status === 'pendente') {
+      list = list.filter(r => !(r.status || '').toLowerCase());
+    }
+
+    // search by name, phone or template
+    if (q) {
+      const qLower = q.toLowerCase();
+      const digits = qLower.replace(/\D+/g, '');
+      list = list.filter(r => {
+        const phoneDigits = String(r.whatsapp || '').replace(/\D+/g, '');
+        return (
+          (r.nome || '').toLowerCase().includes(qLower) ||
+          (r.nome2 || '').toLowerCase().includes(qLower) ||
+          (r.template || '').toLowerCase().includes(qLower) ||
+          (digits && phoneDigits.includes(digits))
+        );
+      });
+    }
+
+    res.json({ list });
+  } catch(e){
+    res.status(500).json({ error: e.message });
+  }
 }
