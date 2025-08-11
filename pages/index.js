@@ -96,23 +96,26 @@ useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
   }
 
   async function createOne(){
-  if (!f.nome || !f.whatsapp || !f.template) return;
+  const name = (f.nome||'').trim();
+  const tpl = (f.template||'').trim();
   const w = (f.whatsapp||'').replace(/\D+/g,'');
-  if (!/^5541\d{9}$/.test(w)) return;
-  setSubmitLoading(true);
+  if (!name || !w || !tpl) { setSubmitError('Preencha: Cliente, WhatsApp e Template'); return; }
+  if (!/^5541\d{9}$/.test(w)) { setSubmitError('WhatsApp inválido. Use 5541 + 9 dígitos (ex: 55419XXXXXXXX)'); return; }
+  setSubmitError(''); setSubmitLoading(true);
   try{
-    const created = await fetchJSON('/api/data/create', { method:'POST', body: JSON.stringify({ ...f, whatsapp: w }) });
-
-useEffect(()=>{ try{ const saved = typeof window!=='undefined' ? (localStorage.getItem('theme')||'dark') : 'dark'; document.documentElement.setAttribute('data-theme', saved); setTheme(saved); }catch{} },[]);
+    const created = await fetchJSON('/api/data/create', { method:'POST', body: JSON.stringify({ ...f, nome:name, whatsapp:w, template:tpl }) });
     const rec = created?.record?.list?.[0] || created?.record || null;
-    const optimistic = { Id: rec?.Id || Math.random(), nome: f.nome, whatsapp: w, nome2: f.nome2, template: f.template, status: '', CreatedAt: new Date().toISOString() };
+    const id = rec?.Id || Math.random();
+    const optimistic = { Id:id, nome:name, whatsapp:w, nome2:f.nome2, template:tpl, status:'', CreatedAt:new Date().toISOString() };
     setList(prev => [optimistic, ...prev]);
     setF({ nome:'', whatsapp:'', nome2:'', template:'' });
     await load();
-  }catch(_){
+  }catch(err){
+    setSubmitError(err?.message || 'Falha ao cadastrar');
   }finally{
     setSubmitLoading(false);
   }
+}
 }
 
   async function delRecord(id){
@@ -254,9 +257,8 @@ useEffect(()=>{ try{ const saved = typeof window!=='undefined' ? (localStorage.g
               </div>
             </Field>
           </div>
-          <div className="mt-3">
-                      </div>
-          <div className="mt-4 flex flex-wrap gap-3">
+          <div className="mt-3">{submitError && (<div className="tag !text-red-300 !border-red-500/40 mb-3">{submitError}</div>)}</div>
+<div className="mt-4 flex flex-wrap gap-3">
             <button className="btn-primary" disabled={submitLoading} onClick={createOne}>{submitLoading ? 'Enviando…' : 'Cadastrar'}</button>
             <button className="btn-soft" onClick={() => setImportOpen(true)}>Importar em massa</button>
           
@@ -270,10 +272,10 @@ useEffect(()=>{ try{ const saved = typeof window!=='undefined' ? (localStorage.g
             <div className="flex items-center gap-3">
               <input className="input w-full md:w-96" placeholder="Buscar por nome, telefone ou template" value={q} onChange={e => setQ(e.target.value)} />
               <select className="input w-48" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
-                <option value="">Todos</option>
-                <option value="">Somente vazios</option>
-                <option value="enviado">Enviado</option>
-              </select>
+  <option value="__all__">Todos</option>
+  <option value="pendente">Pendentes</option>
+  <option value="enviado">Enviados</option>
+</select>
             </div>
           </div>
 
