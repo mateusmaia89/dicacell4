@@ -21,6 +21,7 @@ const writeLocal = (k, v) => {
 };
 
 export default function Home() {
+  const [theme, setTheme] = useState('dark');
   const [authed, setAuthed] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -99,6 +100,8 @@ useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
   setSubmitLoading(true);
   try{
     const created = await fetchJSON('/api/data/create', { method:'POST', body: JSON.stringify({ ...f, whatsapp: w }) });
+
+useEffect(()=>{ try{ const saved = typeof window!=='undefined' ? (localStorage.getItem('theme')||'dark') : 'dark'; document.documentElement.setAttribute('data-theme', saved); setTheme(saved); }catch{} },[]);
     const rec = created?.record?.list?.[0] || created?.record || null;
     const optimistic = { Id: rec?.Id || Math.random(), nome: f.nome, whatsapp: w, nome2: f.nome2, template: f.template, status: '', CreatedAt: new Date().toISOString() };
     setList(prev => [optimistic, ...prev]);
@@ -155,20 +158,28 @@ useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
     );
   }
 
+  function toggleTheme(){
+    const next = theme==='light' ? 'dark' : 'light';
+    try{ document.documentElement.setAttribute('data-theme', next); localStorage.setItem('theme', next); }catch{}
+    setTheme(next);
+  }
   const th = "px-4 py-3 text-left text-xs font-semibold tracking-wider text-n8n-soft uppercase";
   const td = "px-4 py-4 border-t border-n8n-stroke/40";
 
   return (
     <div className="min-h-full bg-orb">
       <header className="px-6 lg:px-10 py-6 flex items-center justify-between">
-        <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
+        <div className="flex items-center gap-3">
           <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-n8n-accent to-n8n-accent2 shadow-neon" />
           <div>
             <div className="font-semibold">Portal de Envios</div>
             <div className="text-xs text-n8n-soft">NocoDB • Vercel</div>
           </div>
         </div>
-        <button className="btn-soft" onClick={logout}>Sair</button>
+        <div className="flex items-center gap-2">
+          <button className="btn-soft" onClick={toggleTheme}>{theme==='light' ? 'Modo escuro' : 'Modo claro'}</button>
+          <button className="btn-soft" onClick={logout}>Sair</button>
+        </div>
       </header>
 
       <main className="px-6 lg:px-10 pb-16 max-w-6xl mx-auto">
