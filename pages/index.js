@@ -21,7 +21,7 @@ const writeLocal = (k, v) => {
 };
 
 export default function Home() {
-  const [authed, setAuthed] = useState(false);
+  const [authed, setAuthed] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const today = new Date().toISOString().slice(0, 10);
@@ -64,7 +64,8 @@ export default function Home() {
     }
   }
 
-  useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
+  useEffect(() => { (async()=>{ try{ const r = await fetch('/api/login'); setAuthed(r.ok); }catch{ setAuthed(false); } })(); }, []);
+useEffect(() => { if (authed) load(); }, [authed, q, statusFilter, from, to]);
 
   function addLocalTemplate(t) {
     const name = (t || '').trim();
@@ -139,7 +140,7 @@ export default function Home() {
   }
   async function logout() { await fetch('/api/logout'); setAuthed(false); }
 
-  if (!authed) {
+  if (authed !== true) {
     return (
       <div className="min-h-full bg-orb flex items-center justify-center px-6">
         <div className="card max-w-md w-full p-8">
