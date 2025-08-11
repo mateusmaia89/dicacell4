@@ -171,20 +171,9 @@ export default function Home() {
 
       <main className="px-6 lg:px-10 pb-16 max-w-6xl mx-auto">
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="card p-5">
-            <div className="text-sm text-n8n-soft">Pendentes</div>
-            <div className="text-4xl font-semibold mt-1">{stats.pendentes}</div>
-          </div>
-          <div className="card p-5">
-            <div className="text-sm text-n8n-soft">Enviados</div>
-            <div className="text-4xl font-semibold mt-1">{stats.enviados}</div>
-          </div>
-          <div className="card p-5">
-            <div className="text-sm text-n8n-soft">Total gasto (USD)</div>
-            <div className="text-4xl font-semibold mt-1">
-              $ {stats.custo?.toFixed ? stats.custo.toFixed(2) : '0.00'}
-            </div>
-          </div>
+          <div className="card p-5"><div className="text-sm text-n8n-soft">Pendentes</div><div className="text-4xl font-semibold mt-1">{stats.pendentes}</div></div>
+          <div className="card p-5"><div className="text-sm text-n8n-soft">Enviados</div><div className="text-4xl font-semibold mt-1">{stats.enviados}</div></div>
+          <div className="card p-5"><div className="text-sm text-n8n-soft">Total gasto (USD)</div><div className="text-4xl font-semibold mt-1">$ {stats.custo?.toFixed ? stats.custo.toFixed(2) : '0.00'}</div></div>
         </section>
 
         <section className="card p-5 mt-4 flex flex-wrap items-center gap-4">
@@ -192,10 +181,10 @@ export default function Home() {
           <Field label="Até"><input type="date" className="input" value={to} onChange={e=>setTo(e.target.value)} /></Field>
           <div className="ml-auto">
             <button
-              className="px-4 py-2 rounded-2xl bg-gradient-to-r from-n8n-accent to-n8n-accent2 text-white shadow-neon hover:opacity-90 transition"
+              className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-neon hover:opacity-90 transition"
               onClick={()=>triggerN8n({ action:'run', from, to })}
             >
-              Disparar fluxo n8n
+              Disparar n8n
             </button>
           </div>
         </section>
