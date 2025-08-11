@@ -101,3 +101,17 @@ body{
 .shadow-neon{ box-shadow: 0 0 22px rgba(124,58,237,0.45), 0 0 42px rgba(255,122,24,0.25); }
 .from-n8n-accent{ --tw-gradient-from: var(--purple); }
 .to-n8n-accent2{ --tw-gradient-to: var(--orange); }
+
+
+@media (max-width: 640px){
+  .card{ border-radius: 18px; }
+  .btn-primary{ padding: 10px 16px; border-radius: 14px; font-size: 0.95rem; letter-spacing:.01em; }
+  .btn-soft{ padding: 9px 14px; border-radius: 12px; font-size: 0.95rem; }
+  .input, select.input, textarea.input{ padding: 10px 12px; border-radius: 12px; }
+  h1, .text-2xl{ font-size: 1.35rem; }
+  h2, .text-xl{ font-size: 1.1rem; }
+  table thead th{ font-size: .7rem; }
+}
+@media (min-width: 641px){
+  .btn-primary{ font-size: 1.05rem; }
+}

@@ -159,7 +159,7 @@ export default function Home() {
   return (
     <div className="min-h-full bg-orb">
       <header className="px-6 lg:px-10 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col md:flex-row md:items-center gap-3 w-full">
           <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-n8n-accent to-n8n-accent2 shadow-neon" />
           <div>
             <div className="font-semibold">Portal de Envios</div>
@@ -239,7 +239,7 @@ export default function Home() {
           </div>
           <div className="mt-3">
                       </div>
-          <div className="mt-4 flex gap-3">
+          <div className="mt-4 flex flex-wrap gap-3">
             <button className="btn-primary" disabled={submitLoading} onClick={createOne}>{submitLoading ? 'Enviando…' : 'Cadastrar'}</button>
             <button className="btn-soft" onClick={() => setImportOpen(true)}>Importar em massa</button>
           
@@ -248,10 +248,10 @@ export default function Home() {
         </section>
 
         <section className="card p-6 mt-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
             <h2 className="text-xl font-semibold">Envios</h2>
             <div className="flex items-center gap-3">
-              <input className="input w-96" placeholder="Buscar por nome, telefone ou template" value={q} onChange={e => setQ(e.target.value)} />
+              <input className="input w-full md:w-96" placeholder="Buscar por nome, telefone ou template" value={q} onChange={e => setQ(e.target.value)} />
               <select className="input w-48" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
                 <option value="">Todos</option>
                 <option value="">Somente vazios</option>
