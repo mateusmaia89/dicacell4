@@ -179,12 +179,17 @@ export default function Home() {
         <section className="card p-5 mt-4 flex flex-wrap items-center gap-4">
           <Field label="De"><input type="date" className="input" value={from} onChange={e=>setFrom(e.target.value)} /></Field>
           <Field label="Até"><input type="date" className="input" value={to} onChange={e=>setTo(e.target.value)} /></Field>
+          <div className="flex items-end gap-2">
+            <button className="btn-soft" onClick={()=>{const n=new Date(); const d=n.toISOString().slice(0,10); setFrom(d); setTo(d);}}>Hoje</button>
+            <button className="btn-soft" onClick={()=>{const n=new Date(); const toD=n.toISOString().slice(0,10); const a=new Date(n); a.setDate(n.getDate()-6); const fromD=a.toISOString().slice(0,10); setFrom(fromD); setTo(toD);}}>7 dias</button>
+            <button className="btn-soft" onClick={()=>{const n=new Date(); const toD=n.toISOString().slice(0,10); const a=new Date(n); a.setDate(n.getDate()-29); const fromD=a.toISOString().slice(0,10); setFrom(fromD); setTo(toD);}}>30 dias</button>
+          </div>
           <div className="ml-auto">
             <button
-              className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-neon hover:opacity-90 transition"
+              className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 text-white shadow-neon hover:opacity-90 transition"
               onClick={()=>triggerN8n({ action:'run', from, to })}
             >
-              Disparar n8n
+              DISPARAR
             </button>
           </div>
         </section>
@@ -196,7 +201,8 @@ export default function Home() {
             <Field label="WhatsApp"><input className="input" value={f.whatsapp} onChange={e => setF(v => ({ ...v, whatsapp: e.target.value }))} placeholder="55419XXXXXXXX" /></Field>
             <Field label="Indicação (opcional)"><input className="input" value={f.nome2} onChange={e => setF(v => ({ ...v, nome2: e.target.value }))} placeholder="Quem indicou" /></Field>
             <Field label="Template">
-              <select
+              <div className="flex gap-2 items-center">
+                <select
                 className="input"
                 value={f.template}
                 onChange={(e) => {
@@ -216,6 +222,13 @@ export default function Home() {
                 {templates.map(t => <option key={t} value={t}>{t}</option>)}
                 <option value="__add__">+ Adicionar novo template…</option>
               </select>
+                <button
+                  className="px-3 py-2 rounded-xl border border-red-500/40 text-red-300 hover:bg-red-500/10 disabled:opacity-40"
+                  disabled={!f.template}
+                  title="Remover este template da lista"
+                  onClick={()=>{ if(f.template){ removeTemplate(f.template); setF(v=>({...v, template:''})); } }}
+                >🗑</button>
+              </div>
             </Field>
           </div>
           <div className="mt-3">
@@ -225,22 +238,6 @@ export default function Home() {
             <button className="btn-soft" onClick={() => setImportOpen(true)}>Importar em massa</button>
           
             <button className="btn-soft" onClick={()=>triggerN8n({ action:'run' })}>Disparar n8n</button>
-          </div>
-        </section>
-
-        <section className="card p-5 mt-6">
-          <h2 className="text-xl font-semibold mb-3">Gerenciar templates</h2>
-          <div className="flex gap-2">
-            <input className="input flex-1" placeholder="Novo template" value={newTpl} onChange={e => setNewTpl(e.target.value)} />
-            <button className="btn-primary" onClick={handleAddTemplate}>Adicionar</button>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {templates.length ? templates.map(t => (
-              <span key={t} className="tag flex items-center gap-2">
-                {t}
-                <button className="hover:!text-red-300" title="Remover este template da lista" onClick={() => removeTemplate(t)}>🗑</button>
-              </span>
-            )) : <span className="text-sm text-n8n-soft">Sem templates.</span>}
           </div>
         </section>
 
