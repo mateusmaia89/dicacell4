@@ -1,3 +1,4 @@
+import { SunIcon, MoonIcon } from "@heroicons/react/24/solid";
 import { useEffect, useMemo, useState } from 'react';
 import { Field } from '../components/Field';
 
@@ -177,7 +178,9 @@ useEffect(()=>{ try{ const saved = typeof window!=='undefined' ? (localStorage.g
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button className="btn-soft" onClick={toggleTheme}>{theme==='light' ? 'Modo escuro' : 'Modo claro'}</button>
+          <button className="p-2 rounded-lg hover:bg-white/5 transition" onClick={toggleTheme} aria-label="Alternar tema">
+  {theme==='light' ? <MoonIcon className="h-5 w-5 text-n8n-soft" /> : <SunIcon className="h-5 w-5 text-n8n-soft" />}
+</button>
           <button className="btn-soft" onClick={logout}>Sair</button>
         </div>
       </header>
