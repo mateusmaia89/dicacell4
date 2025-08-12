@@ -175,19 +175,16 @@ body{
   color: #1F2937;
   border: 1px solid rgba(156,163,175,0.5);
 }
-
 [data-theme="light"] .input::placeholder,
 [data-theme="light"] select.input::placeholder,
 [data-theme="light"] textarea.input::placeholder{
   color:#6B7280;
 }
-
 [data-theme="light"] .input:hover,
 [data-theme="light"] select.input:hover,
 [data-theme="light"] textarea.input:hover{
   border-color: rgba(124,58,237,0.45);
 }
-
 [data-theme="light"] .input:focus,
 [data-theme="light"] select.input:focus,
 [data-theme="light"] textarea.input:focus{
@@ -209,6 +206,11 @@ body{
 .btn-primary:hover{ filter: brightness(1.08); }
 .btn-primary:active{ transform: translateY(1px); }
 
+/* LIGHT MODE FIX - Botão Primário */
+[data-theme="light"] .btn-primary{
+  color: #fff;
+}
+
 .btn-danger{
   display:inline-flex; align-items:center; justify-content:center;
   gap:.5rem; padding: 12px 20px; border-radius: 18px; font-weight:600;
@@ -222,6 +224,12 @@ body{
 .btn-danger:hover{ filter: brightness(1.1); }
 .btn-danger:active{ transform: translateY(1px); }
 
+/* LIGHT MODE FIX - Botão Danger (ex: SAIR) */
+[data-theme="light"] .btn-danger{
+  background-image: linear-gradient(92deg, #ff3cac, #ff512f);
+  color: #fff;
+}
+
 .btn-soft{
   display:inline-flex; align-items:center; justify-content:center;
   padding: 11px 18px; border-radius: 16px; font-weight:500;
@@ -233,6 +241,33 @@ body{
 }
 .btn-soft:hover{ border-color: rgba(255,122,24,0.7); background: rgba(18,20,48,0.98); }
 .btn-soft:active{ transform: translateY(1px); }
+
+/* LIGHT MODE FIX - Botão Soft */
+[data-theme="light"] .btn-soft{
+  background: #fff;
+  color: #1F2937;
+  border: 1px solid rgba(156,163,175,0.5);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+[data-theme="light"] .btn-soft:hover{
+  background: #fff;
+  border-color: rgba(124,58,237,0.45);
+}
+[data-theme="light"] .btn-soft:focus{
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.18);
+}
+
+/* Estados disabled */
+.btn-primary[disabled],
+.btn-soft[disabled],
+.btn-danger[disabled],
+button[disabled]{
+  opacity: .55;
+  cursor: not-allowed;
+  filter: none;
+  box-shadow: none !important;
+}
 
 .tag{
   display:inline-flex; align-items:center; gap:8px;
