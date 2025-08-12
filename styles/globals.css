@@ -167,6 +167,35 @@ body{
 .input:hover{ border-color: rgba(139,92,246,0.7); }
 .input:focus{ border-color: rgba(139,92,246,0.95); box-shadow: 0 0 0 3px rgba(139,92,246,0.25); background:#0F1130; }
 
+/* ===== LIGHT MODE FIX PARA INPUTS ===== */
+[data-theme="light"] .input,
+[data-theme="light"] select.input,
+[data-theme="light"] textarea.input{
+  background: #fff;
+  color: #1F2937;
+  border: 1px solid rgba(156,163,175,0.5);
+}
+
+[data-theme="light"] .input::placeholder,
+[data-theme="light"] select.input::placeholder,
+[data-theme="light"] textarea.input::placeholder{
+  color:#6B7280;
+}
+
+[data-theme="light"] .input:hover,
+[data-theme="light"] select.input:hover,
+[data-theme="light"] textarea.input:hover{
+  border-color: rgba(124,58,237,0.45);
+}
+
+[data-theme="light"] .input:focus,
+[data-theme="light"] select.input:focus,
+[data-theme="light"] textarea.input:focus{
+  background:#fff;
+  border-color: rgba(124,58,237,0.75);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.18);
+}
+
 .btn-primary{
   display:inline-flex; align-items:center; justify-content:center;
   gap:.5rem; padding: 12px 20px; border-radius: 18px; font-weight:600;
