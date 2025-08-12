@@ -204,9 +204,7 @@ body{
   cursor: pointer;
 }
 .btn-primary:hover{ filter: brightness(1.08); }
-.btn-primary:active{ transform: translateY(1px); }
 
-/* LIGHT MODE FIX - Botão Primário */
 [data-theme="light"] .btn-primary{
   color: #fff;
 }
@@ -222,9 +220,7 @@ body{
   cursor: pointer;
 }
 .btn-danger:hover{ filter: brightness(1.1); }
-.btn-danger:active{ transform: translateY(1px); }
 
-/* LIGHT MODE FIX - Botão Danger (ex: SAIR) */
 [data-theme="light"] .btn-danger{
   background-image: linear-gradient(92deg, #ff3cac, #ff512f);
   color: #fff;
@@ -239,10 +235,8 @@ body{
   transition: transform .1s ease, border-color .15s ease, background .15s ease;
   cursor: pointer;
 }
-.btn-soft:hover{ border-color: rgba(255,122,24,0.7); background: rgba(18,20,48,0.98); }
 .btn-soft:active{ transform: translateY(1px); }
 
-/* LIGHT MODE FIX - Botão Soft */
 [data-theme="light"] .btn-soft{
   background: #fff;
   color: #1F2937;
@@ -250,7 +244,7 @@ body{
   box-shadow: 0 4px 14px rgba(0,0,0,0.06);
 }
 [data-theme="light"] .btn-soft:hover{
-  background: #fff;
+  background: #f7f7f7; /* cinza claro */
   border-color: rgba(124,58,237,0.45);
 }
 [data-theme="light"] .btn-soft:focus{
@@ -258,7 +252,6 @@ body{
   box-shadow: 0 0 0 3px rgba(124,58,237,0.18);
 }
 
-/* Estados disabled */
 .btn-primary[disabled],
 .btn-soft[disabled],
 .btn-danger[disabled],
