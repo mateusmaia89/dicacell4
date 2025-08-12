@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 @font-face {
   font-family: 'Geomanist';
   src: url('/fonts/geomanist/Geomanist-Regular.woff2') format('woff2');
@@ -9,7 +8,6 @@
   font-style: normal;
   font-display: swap;
 }
-
 @font-face {
   font-family: 'Geomanist';
   src: url('/fonts/geomanist/Geomanist-Bold.woff2') format('woff2');
@@ -231,7 +229,6 @@ body{
 .shadow-neon{ box-shadow: 0 0 22px rgba(124,58,237,0.45), 0 0 42px rgba(255,122,24,0.25); }
 .from-n8n-accent{ --tw-gradient-from: var(--purple); }
 .to-n8n-accent2{ --tw-gradient-to: var(--orange); }
-
 
 @media (max-width: 640px){
   .card{ border-radius: 18px; }
