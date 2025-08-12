@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @font-face {
   font-family: 'Geomanist';
   src: url('/fonts/geomanist/Geomanist-Regular.woff2') format('woff2');
@@ -8,6 +9,7 @@
   font-style: normal;
   font-display: swap;
 }
+
 @font-face {
   font-family: 'Geomanist';
   src: url('/fonts/geomanist/Geomanist-Bold.woff2') format('woff2');
@@ -84,10 +86,12 @@ body{
   border: 1px solid rgba(229,231,235,0.9);
   box-shadow: 0 10px 26px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,0.05);
 }
+
 .card > *{
   position: relative;
   z-index: 1;
 }
+
 .card::before{
   content:"";
   position:absolute;
@@ -101,6 +105,7 @@ body{
 [data-theme="light"] .card::before{
   background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), rgba(124,58,237,0.15), rgba(255,122,24,0) 70%);
 }
+
 .card::after{
   content:"";
   position:absolute;
@@ -121,6 +126,7 @@ body{
 [data-theme="light"] .card::after{
   background:linear-gradient(115deg, rgba(124,58,237,0.55), rgba(255,122,24,0.55));
 }
+
 .card:hover::before{ opacity:1; }
 .card:hover::after{ opacity:1; }
 .card:hover{
@@ -170,7 +176,7 @@ body{
   box-shadow: 0 8px 22px rgba(124,58,237,0.35), 0 10px 30px rgba(255,122,24,0.22);
   text-transform: uppercase; letter-spacing:.02em;
   cursor: pointer;
- }
+}
 .btn-primary:hover{ filter: brightness(1.08); }
 .btn-primary:active{ transform: translateY(1px); }
 
@@ -244,4 +250,3 @@ body{
   .btn-primary{ font-size: 1.05rem; }
   .btn-danger{ font-size: 1.05rem; }
 }
-
