@@ -341,7 +341,7 @@ export default function Home() {
                       <td className={td}>{r.whatsapp}</td>
                       <td className={td}><span className="mr-3">{r.template || '-'}</span></td>
                       <td className={td}>{r.nome2 || '-'}</td>
-                      <td className={td}><span className={`tag ${sent ? '!border-green-500/40 !text-green-300' : ''}`}>{r.status || 'pendente'}</span></td>
+                      <td className={td}><span className={`tag ${sent ? 'tag-sent' : ''}`}>{r.status || 'pendente'}</span></td>
                       <td className={td}>{created}</td>
                       <td className={td}><button className="btn-soft" onClick={() => delRecord(r.Id)}>excluir</button></td>
                     </tr>
